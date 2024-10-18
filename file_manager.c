@@ -50,6 +50,17 @@ void on_item_activated(GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewCol
     }
 }
 
+void apply_css(GtkWidget *widget) {
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider, 
+        "treeview { font-size: 27px; }", -1, NULL);  
+
+    GtkStyleContext *context = gtk_widget_get_style_context(widget);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+    g_object_unref(provider);
+}
+
 int main(int argc, char *argv[]) {
     GtkWidget *window;
     GtkWidget *scrolled_window;
@@ -73,10 +84,15 @@ int main(int argc, char *argv[]) {
     gtk_container_add(GTK_CONTAINER(scrolled_window), file_list);
 
     renderer = gtk_cell_renderer_text_new();
+
+    g_object_set(renderer, "xalign", 0.5, NULL);
+
     column = gtk_tree_view_column_new_with_attributes("Files", renderer, "text", 0, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(file_list), column);
 
     g_signal_connect(file_list, "row-activated", G_CALLBACK(on_item_activated), NULL);
+
+    apply_css(file_list);
 
     gtk_widget_show_all(window);
 
