@@ -3,7 +3,7 @@
 #include <string.h>
 
 GtkWidget *file_list;
-char current_dir[256] = "/"; 
+char current_dir[256] = "/";
 
 void update_file_list() {
     DIR *d;
@@ -52,13 +52,17 @@ void on_item_activated(GtkTreeView *tree_view, GtkTreePath *path, GtkTreeViewCol
 
 void apply_css(GtkWidget *widget) {
     GtkCssProvider *provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(provider, 
-        "treeview { font-size: 27px; }", -1, NULL);  
+    
+    // CSS string for styling
+    const gchar *css_data = "treeview { font-size: 24px; background-color: #ADD8E6; }";
+    
+    // Load the CSS from data with the correct length
+    gtk_css_provider_load_from_data(provider, css_data, -1, NULL);  // Pass -1 for length for null-terminated strings
 
     GtkStyleContext *context = gtk_widget_get_style_context(widget);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 
-    g_object_unref(provider);
+    g_object_unref(provider); // Free the provider after use
 }
 
 int main(int argc, char *argv[]) {
@@ -84,14 +88,14 @@ int main(int argc, char *argv[]) {
     gtk_container_add(GTK_CONTAINER(scrolled_window), file_list);
 
     renderer = gtk_cell_renderer_text_new();
-
-    g_object_set(renderer, "xalign", 0.5, NULL);
+    g_object_set(renderer, "xalign", 0.5, NULL);  // Center the text in the cell
 
     column = gtk_tree_view_column_new_with_attributes("Files", renderer, "text", 0, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(file_list), column);
 
     g_signal_connect(file_list, "row-activated", G_CALLBACK(on_item_activated), NULL);
 
+    // Apply custom CSS for font size and colors
     apply_css(file_list);
 
     gtk_widget_show_all(window);
@@ -102,4 +106,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-//gcc -o file_manager file_manager.c `pkg-config --cflags --libs gtk+-3.0`
